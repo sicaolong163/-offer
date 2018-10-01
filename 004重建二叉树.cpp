@@ -6,7 +6,8 @@
   则重建二叉树并返回。
 */
 
-/**
+        
+ /**
  * Definition for binary tree
  * struct TreeNode {
  *     int val;
@@ -15,51 +16,30 @@
  *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
  * };
  */
-
-    class Solution {
+class Solution {
 public:
+   TreeNode* dfs(vector<int> &pre,int start_pre,int end_pre,vector<int>&in,int start_in,int end_in)
+   {
+       if(start_pre>end_pre)return nullptr;
+       TreeNode* root=new TreeNode(pre[start_pre]);
+       int index;//找出头结点在中序遍历中的位置；
+       for(int i=start_in;i<=end_in;i++)
+       {
+           if(in[i]==root->val)
+           {
+               index=i;
+               break;
+           }
+       }
+       int left_size=index-start_in;//计算左子树和右子树的长度；
+       int right_size=end_in-index;
+       root->left=dfs(pre,start_pre+1,start_pre+left_size,in,start_in,index-1);//递归调用；
+       root->right=dfs(pre,start_pre+left_size+1,end_pre,in,index+1,end_in);//主要是这个范围一定要找好；不能出错；
+       return root;
+   }
     TreeNode* reConstructBinaryTree(vector<int> pre,vector<int> in)
     {
-        int length=pre.size();
-        if(length==0)
-            return nullptr;
-        TreeNode* pRoot=new TreeNode(pre[0]);//创建根节点并进行初始化；必须初始化哟
-        //pRoot->val=pre[0];
-        pRoot->left=pRoot->right=nullptr;
-        //此时只有一个结点
-        if(pre[0]==pre[length-1])
-        {
-          if(pre[0]==in[0]&&in[0]==in[length-1])
-              return  pRoot;
-            else
-                return nullptr;
-        }
-         
-        //从中序遍历中找到根节点位置，并记录下来 pos_root_of_in;
-        int pos_root_of_in=0;
-        while(in[pos_root_of_in]!=pre[0])
-            ++pos_root_of_in;
-         
-        vector<int >pre_left,pre_right,in_left,in_right;//左右子树的前序遍历数列与中序遍历数列；
-        //左子树的确定（前序的范围:前序从第一位，到pos_root-of-in位）；
-        for(int i=0;i<pos_root_of_in;++i)
-        {
-             in_left.push_back(in[i]);
-            pre_left.push_back(pre[i+1]);
-        
-        }
-        //右子树的确定（范围从根节点的下一位到终点）
-        for(int i=pos_root_of_in+1;i<length;i++)
-        {
-            in_right.push_back(in[i]);
-            pre_right.push_back(pre[i]);
-        }
-        //递归对左右子树的重建；最后就是对整个树的重建；
-        pRoot->left=reConstructBinaryTree(pre_left,in_left);
-        pRoot->right=reConstructBinaryTree(pre_right,in_right);
-         
-        return pRoot;
+       if(pre.size()==0||in.size()==0||pre.size()!=in.size())return nullptr;
+        return dfs(pre,0,pre.size()-1,in,0,in.size()-1);
     }
-        
-     
 };
