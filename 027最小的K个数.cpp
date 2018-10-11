@@ -1,5 +1,6 @@
 class Solution {
 public:
+   //一|堆
     vector<int> GetLeastNumbers_Solution(vector<int> nums, int k) 
     {
         vector<int>result;
@@ -17,7 +18,7 @@ public:
         }
         return result;
     }
-    
+    //二、 优先队列
     vector<int> GetLeastNumbers_Solution(vector<int> nums, int k) 
     {
         vector<int>result;
@@ -31,6 +32,48 @@ public:
             result.push_back(q.top());
             q.pop();
         }
+        return result;
+    }
+    //三、快排
+    int partition(vector<int> &nums, int left,int right)
+    {
+        int pivort=nums[left];
+        while(left<right)
+        {
+            while(left<right&&nums[right]>=pivort)
+                right--;
+            swap(nums[left],nums[right]);
+            while(left<right&&nums[left]<=pivort)
+                left++;
+            swap(nums[left],nums[right]);
+        }
+        return left;
+    }
+    vector<int> GetLeastNumbers_Solution(vector<int> nums, int k) 
+    {
+         vector<int>result;
+        int n=nums.size();
+        if(n<k||n==0||k==0)//为什么这里不增加k==0  就超时啊？
+            return result;
+        int left=0;
+        int right=n-1;
+        int index=partition(nums,left,right);
+       while(index != k-1)
+       {
+           if(index>k-1)
+           {
+               right=index-1;
+               index=partition(nums,left,right);
+           }
+           else if(index<k-1)
+           {
+               left=index+1;
+               index=partition(nums,left,right);
+           }
+       }
+        
+        for(int i=0;i<k;i++)
+            result.push_back(nums[i]);
         return result;
     }
 };
